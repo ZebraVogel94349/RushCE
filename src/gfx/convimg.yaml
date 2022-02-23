@@ -1,0 +1,31 @@
+palettes:
+  - name: palette_gfx
+    fixed-entries:
+      - color: {index: 254, r: 0, g: 0, b: 0}
+      - color: {index: 253, r: 250, g: 240, b: 220}
+      - color: {index: 252, r: 250, g: 10, b: 0}
+      - color: {index: 251, r: 0, g: 220, b: 200}
+      - color: {index: 250, r: 0, g: 50, b: 160}
+      - color: {index: 249, r: 250, g: 200, b: 10}
+      - color: {index: 248, r: 130, g: 80, b: 150}
+      - color: {index: 247, r: 130, g: 60, b: 50}
+      - color: {index: 246, r: 240, g: 90, b: 30}
+      - color: {index: 245, r: 10, g: 100, b: 70}
+      - color: {index: 244, r: 20, g: 120, b: 160}
+      - color: {index: 243, r: 220, g: 220, b: 100}
+      - color: {index: 242, r: 50, g: 70, b: 170}
+      - color: {index: 241, r: 190, g: 170, b: 130}
+      - color: {index: 240, r: 50, g: 70, b: 30}
+      - color: {index: 239, r: 80, g: 200, b: 160}
+      - color: {index: 238, r: 230, g: 140, b: 140}
+      - color: {index: 237, r: 40, g: 40, b: 40}
+      - color: {index: 236, r: 80, g: 80, b: 80}
+      - color: {index: 235, r: 0, g: 200, b: 0}
+    images: automatic
+
+
+outputs:
+  - type: c
+    include-file: gfx.h
+    palettes:
+      - palette_gfx
