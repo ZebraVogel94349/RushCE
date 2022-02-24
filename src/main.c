@@ -21,7 +21,7 @@
 uint8_t car_positions[2][19];
 
 
-void DrawTitle(){//Draw the title
+void DrawTitle(){
 	gfx_SetTextScale(1,1);
 	gfx_SetTextXY(118,10);
 	gfx_PrintString("RushCE v1.1.0");
@@ -37,7 +37,7 @@ void DrawMenu(){//Draw the menu at the bottom
 }
 
 
-void DrawBoard(){// Redraw the background and draws the black grid
+void DrawBoard(){//Draw the black grid
 	gfx_SetColor(254);
 	uint8_t y, z;
 	for(y = 0; y<7; ++y){//Draw horizontal lines
@@ -83,7 +83,7 @@ void GetCarPositionsFromId(uint16_t game_id){//Decode one level from levels.h an
 		encoded_game[13] = encoded_game[13] / 2;
 	}
 
-  car_positions[0][18] = encoded_game[14];//Store the mininum number of moves for the level in car_positions[0][18]
+  car_positions[0][18] = encoded_game[14];//Store the mininum number of moves for the level in car_positions[0][14]
 	//Format of car_positions:
 	//[[Position],[Rotation]]
 	//Rotation 1 = horizontal, Rotation 2 = vertical
@@ -120,7 +120,7 @@ void DrawLevelInfo(uint16_t game_id, uint16_t moves, uint16_t highscore){
 }
 
 
-void DrawCars(){//Draw all Cars from car_positions
+void DrawCars(){
 	uint8_t x, height, width;
 	for(x = 0; x<16; x++){
 		if(car_positions[1][x] == 0){continue;}//No car
@@ -141,7 +141,7 @@ void DrawCars(){//Draw all Cars from car_positions
 	}
 }
 
-void DrawWinScreen(){//Draw the win win screen
+void DrawWinScreen(){
 	gfx_FillScreen(253);
 	gfx_PrintStringXY("Congratulations! You have completed the level!", 2, 100);
 	gfx_PrintStringXY("Press 2nd to return to the main menu...", 37, 120);
@@ -172,7 +172,7 @@ int CheckPos(uint8_t pos){//Check, which car occupies a position
 }
 
 
-void DrawCursor(uint8_t pos, uint8_t color){//Draw the cursor at given position
+void DrawCursor(uint8_t pos, uint8_t color){
 	uint8_t x, car;
 
 	car = CheckPos(pos);//Check, which car is at position
@@ -201,7 +201,7 @@ int main(void){
 	uint8_t highscores[1813] = {0};
 	uint16_t* highscore_sv = (uint16_t*)&highscores;
 
-	srandom(rtc_Time());//Set random seed
+	srandom(rtc_Time());
 	game_id = 0;
 	cursorpos = 0;
 	moves = 0;
@@ -220,15 +220,15 @@ int main(void){
 
 	game_id = highscores[1811] * 256 + highscores[1812];
 
-	gfx_Begin(); //Start the graphics
-  gfx_SetPalette(palette_gfx, sizeof_palette_gfx, 0); //Load Palette
+	gfx_Begin();
+  gfx_SetPalette(palette_gfx, sizeof_palette_gfx, 0);
 	gfx_SetDrawBuffer();
 
-	gfx_FillScreen(253);//Draw Background
+	gfx_FillScreen(253);
 	DrawTitle();
 	gfx_SwapDraw();
 
-	gfx_FillScreen(253);//Draw Background
+	gfx_FillScreen(253);
 	DrawTitle();
 
 	while (!(kb_Data[6] == kb_Clear)){//Main loop
@@ -433,5 +433,5 @@ int main(void){
 
 
   pgrm_CleanUp();
-  gfx_End();// Close the graphics
+  gfx_End();
 }
