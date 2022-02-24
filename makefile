@@ -12,7 +12,7 @@ DEBUGMODE   ?= NDEBUG
 COMPRESSED  ?= YES
 ICON        ?= iconc.png
 DESCRIPTION ?= "RushCE"
-ARCHIVED = YES
+ARCHIVED ?= YES
 
 L ?= graphx
 
