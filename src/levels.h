@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #define levels ((char*)levels_data)
-extern unsigned char levels_data[41653];
+extern unsigned char levels_data[27165];
 
 #ifdef __cplusplus
 }

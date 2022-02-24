@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <debug.h>
 #include <tice.h>
 #include <keypadc.h>
 #include <fileioc.h>
@@ -19,13 +18,13 @@
 #include "levels.h"
 
 
-uint8_t block_positions[2][19];
+uint8_t car_positions[2][19];
 
 
 void DrawTitle(){//Draw the title
 	gfx_SetTextScale(1,1);
 	gfx_SetTextXY(118,10);
-	gfx_PrintString("RushCE v1.0.0");
+	gfx_PrintString("RushCE v1.1.0");
 }
 
 
@@ -52,52 +51,42 @@ void DrawBoard(){// Redraw the background and draws the black grid
 }
 
 
-void GetBlockPositionsFromId(uint16_t game_id){//Decode one level from levels.h and save the position and rotation of all blocks in block_positions
+void GetCarPositionsFromId(uint16_t game_id){//Decode one level from levels.h and save the position and rotation of all cars in car_positions
 	uint8_t x, y;
-	int three_bytes;
-	unsigned char game_string[36], encoded_game_string[23];
+	int two_bytes;
+	unsigned char encoded_game[15];
 
-	memcpy((char *)encoded_game_string, levels + 23 * (1810 - game_id), 23);//Copy one level from levels.h to encoded_game_string
+	memcpy((char *)encoded_game, levels + 15 * (1810 - game_id), 15);//Copy one level from levels.h to encoded_game
 
 	for(x = 0; x<2; x++){//Clear the board
 		for(y = 0; y<18; y++){
-			block_positions[x][y] = 0;
+			car_positions[x][y] = 0;
 		}
 	}
 
-	for(x = 0; x<7; x++){//Encode 7 3-byte base 18 numbers from encoded_game_string to 5 chars in game_string
-		three_bytes = encoded_game_string[x * 3] * 65536 + encoded_game_string[x * 3 + 1] * 256 + encoded_game_string[x * 3 + 2];//Store 3 Bytes from encoded_game_string in three_bytes
-		for(y = 0; y<5; y++){//Convert three_bytes into 5 chars and store them in game_string
-			game_string[x * 5 + 4 - y] = three_bytes % 18 + 'A';
-			three_bytes = three_bytes / 18;
+	for(x = 0; x<6; x++){//Decode 6 2-byte base 37 numbers from encoded_game and store them in car_positions
+		two_bytes = encoded_game[x * 2] * 256 + encoded_game[x * 2 + 1];//Store 2 Bytes from encoded_game in two_bytes
+		for(y = 0; y<3; y++){//Convert two_bytes into 3 car positions and store them in car_positions
+			car_positions[0][x * 3 + 2 - y] = two_bytes % 37;
+			two_bytes = two_bytes / 37;
 		}
 	}
-	game_string[35] = encoded_game_string[21] + 'A';//Convert last byte of encoded_game_string to char
-  block_positions[0][18] = encoded_game_string[22];//Store the mininum number of moves for the level in block_positions[0][18]
 
-		for(x = 0; x<36; x++){//Store position and rotation of all blocks in block_positions
-			if (game_string[x] == 'A' && block_positions[1][0] == 0){block_positions[0][0] = x; block_positions[1][0] = 1;}
-			if (game_string[x] == 'B' && block_positions[1][1] == 0){block_positions[0][1] = x; if(game_string[x + 1] == 'B'){block_positions[1][1] = 1;}else{block_positions[1][1] = 2;}}
-			if (game_string[x] == 'C' && block_positions[1][2] == 0){block_positions[0][2] = x; if(game_string[x + 1] == 'C'){block_positions[1][2] = 1;}else{block_positions[1][2] = 2;}}
-			if (game_string[x] == 'D' && block_positions[1][3] == 0){block_positions[0][3] = x; if(game_string[x + 1] == 'D'){block_positions[1][3] = 1;}else{block_positions[1][3] = 2;}}
-			if (game_string[x] == 'E' && block_positions[1][4] == 0){block_positions[0][4] = x; if(game_string[x + 1] == 'E'){block_positions[1][4] = 1;}else{block_positions[1][4] = 2;}}
-			if (game_string[x] == 'F' && block_positions[1][5] == 0){block_positions[0][5] = x; if(game_string[x + 1] == 'F'){block_positions[1][5] = 1;}else{block_positions[1][5] = 2;}}
-			if (game_string[x] == 'G' && block_positions[1][6] == 0){block_positions[0][6] = x; if(game_string[x + 1] == 'G'){block_positions[1][6] = 1;}else{block_positions[1][6] = 2;}}
-			if (game_string[x] == 'H' && block_positions[1][7] == 0){block_positions[0][7] = x; if(game_string[x + 1] == 'H'){block_positions[1][7] = 1;}else{block_positions[1][7] = 2;}}
-			if (game_string[x] == 'I' && block_positions[1][8] == 0){block_positions[0][8] = x; if(game_string[x + 1] == 'I'){block_positions[1][8] = 1;}else{block_positions[1][8] = 2;}}
-			if (game_string[x] == 'J' && block_positions[1][9] == 0){block_positions[0][9] = x; if(game_string[x + 1] == 'J'){block_positions[1][9] = 1;}else{block_positions[1][9] = 2;}}
-			if (game_string[x] == 'K' && block_positions[1][10] == 0){block_positions[0][10] = x; if(game_string[x + 1] == 'K'){block_positions[1][10] = 1;}else{block_positions[1][10] = 2;}}
-			if (game_string[x] == 'L' && block_positions[1][11] == 0){block_positions[0][11] = x; if(game_string[x + 1] == 'L'){block_positions[1][11] = 1;}else{block_positions[1][11] = 2;}}
-			if (game_string[x] == 'M' && block_positions[1][12] == 0){block_positions[0][12] = x; if(game_string[x + 1] == 'M'){block_positions[1][12] = 1;}else{block_positions[1][12] = 2;}}
-			if (game_string[x] == 'N' && block_positions[1][13] == 0){block_positions[0][13] = x; if(game_string[x + 1] == 'N'){block_positions[1][13] = 1;}else{block_positions[1][13] = 2;}}
-			if (game_string[x] == 'O' && block_positions[1][14] == 0){block_positions[0][14] = x; if(game_string[x + 1] == 'O'){block_positions[1][14] = 1;}else{block_positions[1][14] = 2;}}
-			if (game_string[x] == 'P' && block_positions[1][15] == 0){block_positions[0][15] = x; if(game_string[x + 1] == 'P'){block_positions[1][15] = 1;}else{block_positions[1][15] = 2;}}
-			if (game_string[x] == 'Q' && block_positions[1][16] == 0){block_positions[0][16] = x; block_positions[1][16] = 1;}
-			if (game_string[x] == 'Q' && block_positions[1][16] != 0){block_positions[0][17] = x; block_positions[1][17] = 1;}
-		//Format of block_positions:
-		//[[Position],[Rotation]]
-		//Rotation 1 = horizontal, Rotation 2 = vertical
-		}
+	for(x = 0; x<8; x++){
+		car_positions[1][x] = encoded_game[12] % 2;
+		if(car_positions[1][x] == 0 && car_positions[0][x] != 36){car_positions[1][x] = 2;}
+		encoded_game[12] = encoded_game[12] / 2;
+	}
+	for(x = 8; x<16; x++){
+		car_positions[1][x] = encoded_game[13] % 2;
+		if(car_positions[1][x] == 0 && car_positions[0][x] != 36){car_positions[1][x] = 2;}
+		encoded_game[13] = encoded_game[13] / 2;
+	}
+
+  car_positions[0][18] = encoded_game[14];//Store the mininum number of moves for the level in car_positions[0][18]
+	//Format of car_positions:
+	//[[Position],[Rotation]]
+	//Rotation 1 = horizontal, Rotation 2 = vertical
 }
 
 
@@ -127,28 +116,28 @@ void DrawLevelInfo(uint16_t game_id, uint16_t moves, uint16_t highscore){
   gfx_PrintInt(moves, 1);
 	gfx_PrintStringXY("/", 283, 40);
 	gfx_SetTextXY(267,50);
-	gfx_PrintInt((int)block_positions[0][18], 1);
+	gfx_PrintInt((int)car_positions[0][18], 1);
 }
 
 
-void DrawBlocks(){//Draw all Blocks from block_positions
+void DrawCars(){//Draw all Cars from car_positions
 	uint8_t x, height, width;
 	for(x = 0; x<16; x++){
-		if(block_positions[1][x] == 0){continue;}//No block
-		if(block_positions[1][x] == 2){height = 27; width = 59;}//Short block vertical
-		if(block_positions[1][x] == 2 && x < 5 && x > 0){height = 27; width = 91;}//Long block vertical
-		if(block_positions[1][x] == 1){height = 59; width = 27;}//Short block horizontal
-		if(block_positions[1][x] == 1 && x < 5 && x > 0){height = 91; width = 27;}//Long block horizontal
+		if(car_positions[1][x] == 0){continue;}//No car
+		if(car_positions[1][x] == 2){height = 27; width = 59;}//Short car vertical
+		if(car_positions[1][x] == 2 && x < 5 && x > 0){height = 27; width = 91;}//Long car vertical
+		if(car_positions[1][x] == 1){height = 59; width = 27;}//Short car horizontal
+		if(car_positions[1][x] == 1 && x < 5 && x > 0){height = 91; width = 27;}//Long car horizontal
 		gfx_SetColor(252 - x);
-		gfx_FillRectangle(67 + 32 * (block_positions[0][x] % 6), 32 * (block_positions[0][x] / 6) + 35, height, width);//Draw red block
+		gfx_FillRectangle(67 + 32 * (car_positions[0][x] % 6), 32 * (car_positions[0][x] / 6) + 35, height, width);//Draw red car
 	}
-	if(block_positions[1][16] == 1){
+	if(car_positions[0][16] != 36){
 		gfx_SetColor(236);
-		gfx_FillRectangle(67 + 32 * (block_positions[0][16] % 6), 32 * (block_positions[0][16] / 6) + 35, 27, 27);//Draw first wall
+		gfx_FillRectangle(67 + 32 * (car_positions[0][16] % 6), 32 * (car_positions[0][16] / 6) + 35, 27, 27);//Draw first wall
 	}
-	if(block_positions[1][17] == 1){
+	if(car_positions[0][17] != 36){
 		gfx_SetColor(236);
-		gfx_FillRectangle(67 + 32 * (block_positions[0][17] % 6), 32 * (block_positions[0][17] / 6) + 35, 27, 27);//Draw second wall
+		gfx_FillRectangle(67 + 32 * (car_positions[0][17] % 6), 32 * (car_positions[0][17] / 6) + 35, 27, 27);//Draw second wall
 	}
 }
 
@@ -159,41 +148,43 @@ void DrawWinScreen(){//Draw the win win screen
 }
 
 
-int CheckPos(uint8_t pos){//Check, which block occupies a position
-	uint8_t x, block;
-	block = 99;
+int CheckPos(uint8_t pos){//Check, which car occupies a position
+	uint8_t x, car;
+	car = 99;
 	for(x = 0; x < 16; x++){
-		if(block_positions[0][x] == pos && block_positions[1][x] != 0){block = x; break;}
+		if(car_positions[0][x] == pos && car_positions[1][x] != 0){car = x; break;}
 	}
 	for(x = 0; x < 16; x++){
-		if(block == 99 && block_positions[1][x] == 1 && block_positions[0][x] == pos - 1 && block_positions[1][x] != 0){block = x; break;}
+		if(car == 99 && car_positions[1][x] == 1 && car_positions[0][x] == pos - 1 && car_positions[1][x] != 0){car = x; break;}
 	}
 	for(x = 0; x < 16; x++){
-		if(block == 99 && block_positions[1][x] == 2 && block_positions[0][x] == pos - 6 && block_positions[1][x] != 0){block = x; break;}
+		if(car == 99 && car_positions[1][x] == 2 && car_positions[0][x] == pos - 6 && car_positions[1][x] != 0){car = x; break;}
 	}
-	if(block == 99 && block_positions[0][16] == pos && block_positions[1][x] != 0){block = 16;}
-	if(block == 99 && block_positions[0][17] == pos && block_positions[1][x] != 0){block = 17;}
+	if(car == 99 && car_positions[0][16] == pos && car_positions[1][x] != 0){car = 16;}
+	if(car == 99 && car_positions[0][17] == pos && car_positions[1][x] != 0){car = 17;}
 	for(x = 1; x < 5; x++){
-		if(block == 99 && block_positions[1][x] == 1 && block_positions[0][x] == pos - 2 && block_positions[1][x] != 0){block = x; break;}
+		if(car == 99 && car_positions[1][x] == 1 && car_positions[0][x] == pos - 2 && car_positions[1][x] != 0){car = x; break;}
 	}
 	for(x = 1; x < 5; x++){
-		if(block == 99 && block_positions[1][x] == 2 && block_positions[0][x] == pos - 12 && block_positions[1][x] != 0){block = x; break;}
+		if(car == 99 && car_positions[1][x] == 2 && car_positions[0][x] == pos - 12 && car_positions[1][x] != 0){car = x; break;}
 	}
-	return block;
+	return car;
 }
 
 
 void DrawCursor(uint8_t pos, uint8_t color){//Draw the cursor at given position
-	uint8_t x, block;
+	uint8_t x, car;
 
-	block = CheckPos(pos);//Check, which block is at position
-	if(block == 99){//Draw the cursor just at pos if no block is at position
+	car = CheckPos(pos);//Check, which car is at position
+	if(car == 99){//Draw the cursor just at pos if no car is at position
 		gfx_SetColor(252 - color);
 		gfx_FillRectangle(pos % 6 * 32 + 64, pos / 6 * 32 + 32, 32, 32);
+		gfx_SetColor(253);
+		gfx_FillRectangle(pos % 6 * 32 + 67, pos / 6 * 32 + 35, 27, 27);
 	}
 	else{
-		for(x = 0; x < 36; x++){//Draw cursor at any position where a part of the block, which at pos is, is
-			if(CheckPos(x) == block){
+		for(x = 0; x < 36; x++){//Draw cursor at any position where a part of the car, which at pos is, is
+			if(CheckPos(x) == car){
 				gfx_SetColor(252 - color);
 				gfx_FillRectangle(x % 6 * 32 + 64, x / 6 * 32 + 32, 32, 32);
 			}
@@ -205,7 +196,7 @@ void DrawCursor(uint8_t pos, uint8_t color){//Draw the cursor at given position
 
 int main(void){
 
-	uint16_t game_id, keycountC, keycountA, cursorpos, selectedblock, moves, latestblock, game_status;
+	uint16_t game_id, keycountC, keycountA, cursorpos, selectedcar, moves, latestcar, game_status;
 	kb_key_t keyA, keyC, prevkeyA, prevkeyC;
 	uint8_t highscores[1813] = {0};
 	uint16_t* highscore_sv = (uint16_t*)&highscores;
@@ -214,8 +205,8 @@ int main(void){
 	game_id = 0;
 	cursorpos = 0;
 	moves = 0;
-	selectedblock = 98;
-	latestblock = 99;
+	selectedcar = 98;
+	latestcar = 99;
 	game_status = 0;
 
 	//Load appvar
@@ -245,106 +236,106 @@ int main(void){
 		//Controls
 		if(kb_Data[7] == kb_Left && keyC != prevkeyC){//Left
 			if(game_status == 0 && game_id > 0){game_id = game_id - 1;}
-			if(game_status == 1 && cursorpos % 6 > 0 && selectedblock == 98){//Move cursor left
+			if(game_status == 1 && cursorpos % 6 > 0 && selectedcar == 98){//Move cursor left
 				if(CheckPos(cursorpos - 1) == 99){cursorpos = cursorpos - 1;}
-				else if(CheckPos(cursorpos) != CheckPos(cursorpos - 1)){cursorpos = block_positions[0][CheckPos(cursorpos - 1)];}
+				else if(CheckPos(cursorpos) != CheckPos(cursorpos - 1)){cursorpos = car_positions[0][CheckPos(cursorpos - 1)];}
 				else if(CheckPos(cursorpos - 2) == 99){cursorpos = cursorpos - 2;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 1 ) && CheckPos(cursorpos) != CheckPos(cursorpos - 2) && cursorpos % 6 > 1){cursorpos = block_positions[0][CheckPos(cursorpos - 2)];}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 1 ) && CheckPos(cursorpos) != CheckPos(cursorpos - 2) && cursorpos % 6 > 1){cursorpos = car_positions[0][CheckPos(cursorpos - 2)];}
 				else if(CheckPos(cursorpos - 3) == 99){cursorpos = cursorpos - 3;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 1 ) && CheckPos(cursorpos) == CheckPos(cursorpos - 2) && cursorpos % 6 > 2){cursorpos = block_positions[0][CheckPos(cursorpos - 3)];}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 1 ) && CheckPos(cursorpos) == CheckPos(cursorpos - 2) && cursorpos % 6 > 2){cursorpos = car_positions[0][CheckPos(cursorpos - 3)];}
 			}
-			if(game_status == 1 && cursorpos % 6 > 0 && selectedblock != 98 && CheckPos(block_positions[0][CheckPos(cursorpos)] - 1) == 99 && block_positions[1][CheckPos(cursorpos)] == 1){//Move block left
-				block_positions[0][CheckPos(cursorpos)] = block_positions[0][CheckPos(cursorpos)] - 1;
+			if(game_status == 1 && cursorpos % 6 > 0 && selectedcar != 98 && CheckPos(car_positions[0][CheckPos(cursorpos)] - 1) == 99 && car_positions[1][CheckPos(cursorpos)] == 1){//Move car left
+				car_positions[0][CheckPos(cursorpos)] = car_positions[0][CheckPos(cursorpos)] - 1;
 				cursorpos = cursorpos - 1;
-				if(CheckPos(cursorpos) != latestblock){
+				if(CheckPos(cursorpos) != latestcar){
 					moves = moves + 1;
 				}
-				latestblock = CheckPos(cursorpos);
+				latestcar = CheckPos(cursorpos);
 			}
 		}
 
 		if(kb_Data[7] == kb_Right && keyC != prevkeyC){//Right
 			if(game_status == 0 && game_id < 1810){game_id = game_id + 1;}
-			if(game_status == 1 && cursorpos % 6 < 5 && selectedblock == 98){//Move cursor right
+			if(game_status == 1 && cursorpos % 6 < 5 && selectedcar == 98){//Move cursor right
 				if(CheckPos(cursorpos + 1) == 99){cursorpos = cursorpos + 1;}
-				else if(CheckPos(cursorpos) != CheckPos(cursorpos + 1)){cursorpos = block_positions[0][CheckPos(cursorpos + 1)];}
+				else if(CheckPos(cursorpos) != CheckPos(cursorpos + 1)){cursorpos = car_positions[0][CheckPos(cursorpos + 1)];}
 				else if(CheckPos(cursorpos + 2) == 99){cursorpos = cursorpos + 2;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 1 ) && CheckPos(cursorpos) != CheckPos(cursorpos + 2) && cursorpos % 6 < 4){cursorpos = block_positions[0][CheckPos(cursorpos + 2)];}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 1 ) && CheckPos(cursorpos) != CheckPos(cursorpos + 2) && cursorpos % 6 < 4){cursorpos = car_positions[0][CheckPos(cursorpos + 2)];}
 				else if(CheckPos(cursorpos + 3) == 99){cursorpos = cursorpos + 3;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 1 ) && CheckPos(cursorpos) == CheckPos(cursorpos + 2) && cursorpos % 6 < 3){cursorpos = block_positions[0][CheckPos(cursorpos + 3)];}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 1 ) && CheckPos(cursorpos) == CheckPos(cursorpos + 2) && cursorpos % 6 < 3){cursorpos = car_positions[0][CheckPos(cursorpos + 3)];}
 			}
-			if(game_status == 1 && selectedblock != 98 && (((CheckPos(cursorpos) == 0 || (CheckPos(cursorpos) > 4  && CheckPos(cursorpos) < 16)) && CheckPos(block_positions[0][CheckPos(cursorpos)] + 2) == 99 && cursorpos % 6 < 4)|| ((CheckPos(cursorpos) > 0  && CheckPos(cursorpos) < 5) && CheckPos(block_positions[0][CheckPos(cursorpos)] + 3) == 99 && cursorpos % 6 < 3)) && block_positions[1][CheckPos(cursorpos)] == 1){//Move block right
-				block_positions[0][CheckPos(cursorpos)] = block_positions[0][CheckPos(cursorpos)] + 1;
+			if(game_status == 1 && selectedcar != 98 && (((CheckPos(cursorpos) == 0 || (CheckPos(cursorpos) > 4  && CheckPos(cursorpos) < 16)) && CheckPos(car_positions[0][CheckPos(cursorpos)] + 2) == 99 && cursorpos % 6 < 4)|| ((CheckPos(cursorpos) > 0  && CheckPos(cursorpos) < 5) && CheckPos(car_positions[0][CheckPos(cursorpos)] + 3) == 99 && cursorpos % 6 < 3)) && car_positions[1][CheckPos(cursorpos)] == 1){//Move car right
+				car_positions[0][CheckPos(cursorpos)] = car_positions[0][CheckPos(cursorpos)] + 1;
 				cursorpos = cursorpos + 1;
-				if(CheckPos(cursorpos) != latestblock){
+				if(CheckPos(cursorpos) != latestcar){
 					moves = moves + 1;
 				}
-				latestblock = CheckPos(cursorpos);
-				if(block_positions[0][0] == 16){//Win
+				latestcar = CheckPos(cursorpos);
+				if(car_positions[0][0] == 16){//Win
 					highscores[game_id] = moves;
 					game_status = 2;
 					cursorpos = 0;
-					selectedblock = 98;
+					selectedcar = 98;
 					moves = 0;
-					latestblock = 99;
+					latestcar = 99;
 				}
 			}
 		}
 
 		if(kb_Data[7] == kb_Up && keyC != prevkeyC){//Up
-			if(game_status == 1 && cursorpos / 6 > 0 && selectedblock == 98){//Move cursor up
+			if(game_status == 1 && cursorpos / 6 > 0 && selectedcar == 98){//Move cursor up
 				if(CheckPos(cursorpos - 6) == 99){cursorpos = cursorpos - 6;}
-				else if(CheckPos(cursorpos) != CheckPos(cursorpos - 6)){cursorpos = block_positions[0][CheckPos(cursorpos - 6)];}
+				else if(CheckPos(cursorpos) != CheckPos(cursorpos - 6)){cursorpos = car_positions[0][CheckPos(cursorpos - 6)];}
 				else if(CheckPos(cursorpos - 12) == 99){cursorpos = cursorpos - 12;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 6 ) && CheckPos(cursorpos) != CheckPos(cursorpos - 12) && cursorpos / 6 > 1){cursorpos = block_positions[0][CheckPos(cursorpos - 12)];}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 6 ) && CheckPos(cursorpos) != CheckPos(cursorpos - 12) && cursorpos / 6 > 1){cursorpos = car_positions[0][CheckPos(cursorpos - 12)];}
 				else if(CheckPos(cursorpos - 18) == 99){cursorpos = cursorpos - 18;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 6 ) && CheckPos(cursorpos) == CheckPos(cursorpos - 12) && cursorpos / 6 > 2){cursorpos = block_positions[0][CheckPos(cursorpos - 18)];}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 6 ) && CheckPos(cursorpos) == CheckPos(cursorpos - 12) && cursorpos / 6 > 2){cursorpos = car_positions[0][CheckPos(cursorpos - 18)];}
 			}
-			if(game_status == 1 && cursorpos / 6 > 0 && selectedblock != 98 && CheckPos(block_positions[0][CheckPos(cursorpos)] - 6) == 99 && block_positions[1][CheckPos(cursorpos)] == 2){//Move block up
-				block_positions[0][CheckPos(cursorpos)] = block_positions[0][CheckPos(cursorpos)] - 6;
+			if(game_status == 1 && cursorpos / 6 > 0 && selectedcar != 98 && CheckPos(car_positions[0][CheckPos(cursorpos)] - 6) == 99 && car_positions[1][CheckPos(cursorpos)] == 2){//Move car up
+				car_positions[0][CheckPos(cursorpos)] = car_positions[0][CheckPos(cursorpos)] - 6;
 				cursorpos = cursorpos - 6;
-				if(CheckPos(cursorpos) != latestblock){
+				if(CheckPos(cursorpos) != latestcar){
 					moves = moves + 1;
 				}
-				latestblock = CheckPos(cursorpos);
+				latestcar = CheckPos(cursorpos);
 			}
 		}
 
 		if(kb_Data[7] == kb_Down && keyC != prevkeyC){//Down
-			if(game_status == 1 && cursorpos / 6 < 5 && selectedblock == 98){//Move cursor down
+			if(game_status == 1 && cursorpos / 6 < 5 && selectedcar == 98){//Move cursor down
 				if(CheckPos(cursorpos + 6) == 99){cursorpos = cursorpos + 6;}
-				else if(CheckPos(cursorpos) != CheckPos(cursorpos + 6)){cursorpos = block_positions[0][CheckPos(cursorpos + 6)];}
+				else if(CheckPos(cursorpos) != CheckPos(cursorpos + 6)){cursorpos = car_positions[0][CheckPos(cursorpos + 6)];}
 				else if(CheckPos(cursorpos + 12) == 99){cursorpos = cursorpos + 12;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 6 ) && CheckPos(cursorpos) != CheckPos(cursorpos + 12) && cursorpos / 6 < 4){cursorpos = block_positions[0][CheckPos(cursorpos + 12)];}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 6 ) && CheckPos(cursorpos) != CheckPos(cursorpos + 12) && cursorpos / 6 < 4){cursorpos = car_positions[0][CheckPos(cursorpos + 12)];}
 				else if(CheckPos(cursorpos + 18) == 99){cursorpos = cursorpos + 18;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 6 ) && CheckPos(cursorpos) == CheckPos(cursorpos + 12) && cursorpos / 6 < 3){cursorpos = block_positions[0][CheckPos(cursorpos + 18)];}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 6 ) && CheckPos(cursorpos) == CheckPos(cursorpos + 12) && cursorpos / 6 < 3){cursorpos = car_positions[0][CheckPos(cursorpos + 18)];}
 			}
 
-			if(game_status == 1 && selectedblock != 98 && ((((CheckPos(cursorpos) > 4  && CheckPos(cursorpos) < 16)) && CheckPos(block_positions[0][CheckPos(cursorpos)] + 12) == 99  && cursorpos / 6 < 4) || ((CheckPos(cursorpos) > 0  && CheckPos(cursorpos) < 5) && CheckPos(block_positions[0][CheckPos(cursorpos)] + 18) == 99 && cursorpos / 6 < 3)) && block_positions[1][CheckPos(cursorpos)] == 2){//Move block down
-				block_positions[0][CheckPos(cursorpos)] = block_positions[0][CheckPos(cursorpos)] + 6;
+			if(game_status == 1 && selectedcar != 98 && ((((CheckPos(cursorpos) > 4  && CheckPos(cursorpos) < 16)) && CheckPos(car_positions[0][CheckPos(cursorpos)] + 12) == 99  && cursorpos / 6 < 4) || ((CheckPos(cursorpos) > 0  && CheckPos(cursorpos) < 5) && CheckPos(car_positions[0][CheckPos(cursorpos)] + 18) == 99 && cursorpos / 6 < 3)) && car_positions[1][CheckPos(cursorpos)] == 2){//Move car down
+				car_positions[0][CheckPos(cursorpos)] = car_positions[0][CheckPos(cursorpos)] + 6;
 				cursorpos = cursorpos + 6;
-				if(CheckPos(cursorpos) != latestblock){
+				if(CheckPos(cursorpos) != latestcar){
 					moves = moves + 1;
 				}
-				latestblock = CheckPos(cursorpos);
+				latestcar = CheckPos(cursorpos);
 			}
 		}
 
 		if(kb_Data[1] == kb_2nd && keyA != prevkeyA){//2nd
 		 if (game_status == 0){game_status = 1;}
-		 else if (game_status == 1 && CheckPos(cursorpos) != 99 && CheckPos(cursorpos) != 17 && CheckPos(cursorpos) != 16 && selectedblock == 98){//select block to move
-			 selectedblock = CheckPos(cursorpos);
+		 else if (game_status == 1 && CheckPos(cursorpos) != 99 && CheckPos(cursorpos) != 17 && CheckPos(cursorpos) != 16 && selectedcar == 98){//select car to move
+			 selectedcar = CheckPos(cursorpos);
 		 }
-		 else if (game_status == 1 && selectedblock != 98){//unselect block
-			 selectedblock = 98;
-			 latestblock = 99;
+		 else if (game_status == 1 && selectedcar != 98){//unselect car
+			 selectedcar = 98;
+			 latestcar = 99;
 		 }
 		 if(game_status == 2){//Exit the win screen
 			 game_status = 0;
 			 cursorpos = 0;
-			 selectedblock = 98;
+			 selectedcar = 98;
 			 moves = 0;
-			 latestblock = 99;
+			 latestcar = 99;
 			 gfx_FillScreen(253);
 			 DrawTitle();
 			 gfx_SwapDraw();
@@ -354,27 +345,27 @@ int main(void){
 		}
 
 		if(kb_Data[1] == kb_Del && keyA != prevkeyA){//del
+			if(game_status == 0){//Exit the game
+				break;
+			}
 			if(game_status == 1){//Exit the level
 				game_status = 0;
 				cursorpos = 0;
-				selectedblock = 98;
+				selectedcar = 98;
 				moves = 0;
-				latestblock = 99;
+				latestcar = 99;
 			}
 			if(game_status == 2){//Exit the win screen
 				game_status = 0;
 				cursorpos = 0;
-				selectedblock = 98;
+				selectedcar = 98;
 				moves = 0;
-				latestblock = 99;
+				latestcar = 99;
 				gfx_FillScreen(253);
  			  DrawTitle();
  			  gfx_SwapDraw();
  			  gfx_FillScreen(253);
  			  DrawTitle();
-			}
-			else{//Exit the game
-				break;
 			}
 		}
 
@@ -391,32 +382,19 @@ int main(void){
 
 
 
-		if(game_status == 0){GetBlockPositionsFromId(game_id);}
+		if(game_status == 0){GetCarPositionsFromId(game_id);}
 
 
 		//Graphics
 		gfx_SetColor(253);
 		gfx_FillRectangle(64,32,193,193);//Redraw Background
-		if(game_status == 1 && selectedblock == 98){DrawCursor(cursorpos, 0);}
-		if(game_status == 1 && selectedblock != 98){DrawCursor(cursorpos, 3);}
+		if(game_status == 1 && selectedcar == 98){DrawCursor(cursorpos, 0);}
+		if(game_status == 1 && selectedcar != 98){DrawCursor(cursorpos, 3);}
 		DrawBoard();
 		DrawLevelInfo(game_id, moves, highscores[game_id]);
 		gfx_SetColor(253);
 		gfx_FillRectangle(10,230,300,8);
-		DrawBlocks();
-		if(game_status == 0){DrawMenu();}
-		if(game_status == 2){DrawWinScreen();}
-		gfx_SwapDraw();
-
-		gfx_SetColor(253);
-		gfx_FillRectangle(64,32,193,193);//Redraw Background
-		if(game_status == 1 && selectedblock == 98){DrawCursor(cursorpos, 0);}
-		if(game_status == 1 && selectedblock != 98){DrawCursor(cursorpos, 3);}
-		DrawBoard();
-		DrawLevelInfo(game_id, moves, highscores[game_id]);
-		gfx_SetColor(253);
-		gfx_FillRectangle(10,230,300,8);
-		DrawBlocks();
+		DrawCars();
 		if(game_status == 0){DrawMenu();}
 		if(game_status == 2){DrawWinScreen();}
 		gfx_SwapDraw();

@@ -7,9 +7,9 @@ Section          Base   Top    High   Length
 .init.reruncheck D1A957 D1A957             0h
 .init            D1A957 D1A981            2Ah
 .fini            D1A981 D1A9B5            34h
-.text            D1A9B5 D1D76B          2DB6h
-.data            D1D76B D27C2E          A4C3h
-.rodata          D27C2E D27CFA            CCh
+.text            D1A9B5 D1D543          2B8Eh
+.data            D1D543 D2416E          6C2Bh
+.rodata          D2416E D2423A            CCh
 .init_array      000000 000000             0h
 .ctors           000000 000000             0h
 .dtors           000000 000000             0h
@@ -33,7 +33,7 @@ _os_DisableHomeTextBuffer = D1A9B5
 _os_EnableHomeTextBuffer  = D1A9C7
 _random                   = D1A9D9
 _srandom                  = D1AA30
-__state                   = D1D76B
+__state                   = D1D543
 __bdivu                   = D1AA47
 __frameset                = D1AA5D
 __bshl                    = 000100
@@ -46,10 +46,10 @@ __sand                    = 000200
 __setflag                 = 000218
 __sremu                   = 00023C
 __sshl                    = 000240
-.missingappvar            = D27C2E
-.libloadname              = D27C33
+.missingappvar            = D2416E
+.libloadname              = D24173
 .libloadnamelen           = 000007
-.webaddress               = D27C3B
+.webaddress               = D2417B
 __start                   = D1A957
 ___exithl                 = D1A981
 skip._exit                = D1A981
@@ -57,35 +57,35 @@ skip.__Exit               = D1A981
 skip._abort               = D1A981
 _exit.sp                  = D1A982
 _exit.flash_wait_states   = D1A98C
-_palette_gfx              = D1D77B
-_levels_data              = D1D979
+_palette_gfx              = D1D553
+_levels_data              = D1D751
 _DrawTitle                = D1AA6B
 _DrawMenu                 = D1AA92
 _DrawBoard                = D1AB01
-_GetBlockPositionsFromId  = D1ABA8
-_DrawLevelInfo            = D1AF62
-_DrawBlocks               = D1B0F9
-_DrawWinScreen            = D1B304
-_CheckPos                 = D1B33B
-_DrawCursor               = D1B563
-_main                     = D1B65D
-L_.str                    = D27C50
-L_.str.1                  = D27C5E
-L_.str.2                  = D27C63
-L_.str.3                  = D27C67
-L_.str.4                  = D27C6E
-L_.str.5                  = D27C72
-_block_positions          = D052C6
-L_.str.6                  = D27C77
-L_.str.7                  = D27C7E
-L_.str.8                  = D27C80
-L_.str.9                  = D27C85
-L_.str.10                 = D27C90
-L_.str.11                 = D27C97
-L_.str.12                 = D27CC6
-L_.str.13                 = D27CEE
-L_.str.14                 = D27CF5
-L_.str.15                 = D27CF8
+_GetCarPositionsFromId    = D1ABB0
+_DrawLevelInfo            = D1AD5E
+_DrawCars                 = D1AEF7
+_DrawWinScreen            = D1B124
+_CheckPos                 = D1B15B
+_DrawCursor               = D1B3C3
+_main                     = D1B4F8
+L_.str                    = D24190
+L_.str.1                  = D2419E
+L_.str.2                  = D241A3
+L_.str.3                  = D241A7
+L_.str.4                  = D241AE
+L_.str.5                  = D241B2
+_car_positions            = D052C6
+L_.str.6                  = D241B7
+L_.str.7                  = D241BE
+L_.str.8                  = D241C0
+L_.str.9                  = D241C5
+L_.str.10                 = D241D0
+L_.str.11                 = D241D7
+L_.str.12                 = D24206
+L_.str.13                 = D2422E
+L_.str.14                 = D24235
+L_.str.15                 = D24238
 _#ti_Open                 = D1A8F0
 _#ti_Close                = D1A8F4
 _#ti_Write                = D1A8F8
