@@ -24,7 +24,7 @@ uint8_t car_positions[2][19];
 void DrawTitle(){
 	gfx_SetTextScale(1,1);
 	gfx_SetTextXY(118,10);
-	gfx_PrintString("RushCE v1.1.0");
+	gfx_PrintString("RushCE v1.2.0");
 }
 
 
@@ -82,8 +82,7 @@ void GetCarPositionsFromId(uint16_t game_id){//Decode one level from levels.h an
 		if(car_positions[1][x] == 0 && car_positions[0][x] != 36){car_positions[1][x] = 2;}
 		encoded_game[13] = encoded_game[13] / 2;
 	}
-
-  car_positions[0][18] = encoded_game[14];//Store the mininum number of moves for the level in car_positions[0][14]
+    car_positions[0][18] = encoded_game[14];//Store the mininum number of moves for the level in car_positions[0][14]
 	//Format of car_positions:
 	//[[Position],[Rotation]]
 	//Rotation 1 = horizontal, Rotation 2 = vertical
@@ -113,7 +112,7 @@ void DrawLevelInfo(uint16_t game_id, uint16_t moves, uint16_t highscore){
 	gfx_FillRectangle(267,30,40,40);
 	gfx_PrintStringXY("Moves:", 267, 30);
 	gfx_SetTextXY(267,40);
-  gfx_PrintInt(moves, 1);
+    gfx_PrintInt(moves, 1);
 	gfx_PrintStringXY("/", 283, 40);
 	gfx_SetTextXY(267,50);
 	gfx_PrintInt((int)car_positions[0][18], 1);
@@ -154,14 +153,14 @@ int CheckPos(uint8_t pos){//Check, which car occupies a position
 	for(x = 0; x < 16; x++){
 		if(car_positions[0][x] == pos && car_positions[1][x] != 0){car = x; break;}
 	}
+    if(car_positions[0][16] == pos){car = 16;}
+    if(car_positions[0][17] == pos){car = 17;}
 	for(x = 0; x < 16; x++){
 		if(car == 99 && car_positions[1][x] == 1 && car_positions[0][x] == pos - 1 && car_positions[1][x] != 0){car = x; break;}
 	}
 	for(x = 0; x < 16; x++){
 		if(car == 99 && car_positions[1][x] == 2 && car_positions[0][x] == pos - 6 && car_positions[1][x] != 0){car = x; break;}
 	}
-	if(car == 99 && car_positions[0][16] == pos && car_positions[1][x] != 0){car = 16;}
-	if(car == 99 && car_positions[0][17] == pos && car_positions[1][x] != 0){car = 17;}
 	for(x = 1; x < 5; x++){
 		if(car == 99 && car_positions[1][x] == 1 && car_positions[0][x] == pos - 2 && car_positions[1][x] != 0){car = x; break;}
 	}
@@ -221,7 +220,7 @@ int main(void){
 	game_id = highscores[1811] * 256 + highscores[1812];
 
 	gfx_Begin();
-  gfx_SetPalette(palette_gfx, sizeof_palette_gfx, 0);
+    gfx_SetPalette(palette_gfx, sizeof_palette_gfx, 0);
 	gfx_SetDrawBuffer();
 
 	gfx_FillScreen(253);
@@ -239,9 +238,9 @@ int main(void){
 			if(game_status == 1 && cursorpos % 6 > 0 && selectedcar == 98){//Move cursor left
 				if(CheckPos(cursorpos - 1) == 99){cursorpos = cursorpos - 1;}
 				else if(CheckPos(cursorpos) != CheckPos(cursorpos - 1)){cursorpos = car_positions[0][CheckPos(cursorpos - 1)];}
-				else if(CheckPos(cursorpos - 2) == 99){cursorpos = cursorpos - 2;}
+				else if(CheckPos(cursorpos - 2) == 99 && cursorpos % 6 > 1){cursorpos = cursorpos - 2;}
 				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 1 ) && CheckPos(cursorpos) != CheckPos(cursorpos - 2) && cursorpos % 6 > 1){cursorpos = car_positions[0][CheckPos(cursorpos - 2)];}
-				else if(CheckPos(cursorpos - 3) == 99){cursorpos = cursorpos - 3;}
+				else if(CheckPos(cursorpos - 3) == 99 && cursorpos % 6 > 2){cursorpos = cursorpos - 3;}
 				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 1 ) && CheckPos(cursorpos) == CheckPos(cursorpos - 2) && cursorpos % 6 > 2){cursorpos = car_positions[0][CheckPos(cursorpos - 3)];}
 			}
 			if(game_status == 1 && cursorpos % 6 > 0 && selectedcar != 98 && CheckPos(car_positions[0][CheckPos(cursorpos)] - 1) == 99 && car_positions[1][CheckPos(cursorpos)] == 1){//Move car left
@@ -259,9 +258,9 @@ int main(void){
 			if(game_status == 1 && cursorpos % 6 < 5 && selectedcar == 98){//Move cursor right
 				if(CheckPos(cursorpos + 1) == 99){cursorpos = cursorpos + 1;}
 				else if(CheckPos(cursorpos) != CheckPos(cursorpos + 1)){cursorpos = car_positions[0][CheckPos(cursorpos + 1)];}
-				else if(CheckPos(cursorpos + 2) == 99){cursorpos = cursorpos + 2;}
-				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 1 ) && CheckPos(cursorpos) != CheckPos(cursorpos + 2) && cursorpos % 6 < 4){cursorpos = car_positions[0][CheckPos(cursorpos + 2)];}
-				else if(CheckPos(cursorpos + 3) == 99){cursorpos = cursorpos + 3;}
+				else if(CheckPos(cursorpos + 2) == 99 && cursorpos % 6 < 4){cursorpos = cursorpos + 2;}
+				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 1) && CheckPos(cursorpos) != CheckPos(cursorpos + 2) && cursorpos % 6 < 4){cursorpos = car_positions[0][CheckPos(cursorpos + 2)];}
+				else if(CheckPos(cursorpos + 3) == 99 && cursorpos % 64 < 3){cursorpos = cursorpos + 3;}
 				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 1 ) && CheckPos(cursorpos) == CheckPos(cursorpos + 2) && cursorpos % 6 < 3){cursorpos = car_positions[0][CheckPos(cursorpos + 3)];}
 			}
 			if(game_status == 1 && selectedcar != 98 && (((CheckPos(cursorpos) == 0 || (CheckPos(cursorpos) > 4  && CheckPos(cursorpos) < 16)) && CheckPos(car_positions[0][CheckPos(cursorpos)] + 2) == 99 && cursorpos % 6 < 4)|| ((CheckPos(cursorpos) > 0  && CheckPos(cursorpos) < 5) && CheckPos(car_positions[0][CheckPos(cursorpos)] + 3) == 99 && cursorpos % 6 < 3)) && car_positions[1][CheckPos(cursorpos)] == 1){//Move car right
@@ -286,9 +285,9 @@ int main(void){
 			if(game_status == 1 && cursorpos / 6 > 0 && selectedcar == 98){//Move cursor up
 				if(CheckPos(cursorpos - 6) == 99){cursorpos = cursorpos - 6;}
 				else if(CheckPos(cursorpos) != CheckPos(cursorpos - 6)){cursorpos = car_positions[0][CheckPos(cursorpos - 6)];}
-				else if(CheckPos(cursorpos - 12) == 99){cursorpos = cursorpos - 12;}
+				else if(CheckPos(cursorpos - 12) == 99 && cursorpos / 6 > 1){cursorpos = cursorpos - 12;}
 				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 6 ) && CheckPos(cursorpos) != CheckPos(cursorpos - 12) && cursorpos / 6 > 1){cursorpos = car_positions[0][CheckPos(cursorpos - 12)];}
-				else if(CheckPos(cursorpos - 18) == 99){cursorpos = cursorpos - 18;}
+				else if(CheckPos(cursorpos - 18) == 99 && cursorpos / 6 > 2){cursorpos = cursorpos - 18;}
 				else if(CheckPos(cursorpos) == CheckPos(cursorpos - 6 ) && CheckPos(cursorpos) == CheckPos(cursorpos - 12) && cursorpos / 6 > 2){cursorpos = car_positions[0][CheckPos(cursorpos - 18)];}
 			}
 			if(game_status == 1 && cursorpos / 6 > 0 && selectedcar != 98 && CheckPos(car_positions[0][CheckPos(cursorpos)] - 6) == 99 && car_positions[1][CheckPos(cursorpos)] == 2){//Move car up
@@ -305,9 +304,9 @@ int main(void){
 			if(game_status == 1 && cursorpos / 6 < 5 && selectedcar == 98){//Move cursor down
 				if(CheckPos(cursorpos + 6) == 99){cursorpos = cursorpos + 6;}
 				else if(CheckPos(cursorpos) != CheckPos(cursorpos + 6)){cursorpos = car_positions[0][CheckPos(cursorpos + 6)];}
-				else if(CheckPos(cursorpos + 12) == 99){cursorpos = cursorpos + 12;}
+				else if(CheckPos(cursorpos + 12) == 99 && cursorpos / 6 < 4){cursorpos = cursorpos + 12;}
 				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 6 ) && CheckPos(cursorpos) != CheckPos(cursorpos + 12) && cursorpos / 6 < 4){cursorpos = car_positions[0][CheckPos(cursorpos + 12)];}
-				else if(CheckPos(cursorpos + 18) == 99){cursorpos = cursorpos + 18;}
+				else if(CheckPos(cursorpos + 18) == 99 && cursorpos / 6 < 3){cursorpos = cursorpos + 18;}
 				else if(CheckPos(cursorpos) == CheckPos(cursorpos + 6 ) && CheckPos(cursorpos) == CheckPos(cursorpos + 12) && cursorpos / 6 < 3){cursorpos = car_positions[0][CheckPos(cursorpos + 18)];}
 			}
 
@@ -370,18 +369,19 @@ int main(void){
 		}
 
 		//Bottom menu navigation
-		if(kb_Data[1] == kb_Yequ && game_id > 99 && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = game_id - 100;}
-		if(kb_Data[1] == kb_Yequ && game_id < 100 && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = 0;}
-		if(kb_Data[1] == kb_Window && game_id > 9 && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = game_id - 10;}
-		if(kb_Data[1] == kb_Window && game_id < 10 && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = 0;}
-		if(kb_Data[1] == kb_Zoom && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = random() % 1811;}
-		if(kb_Data[1] == kb_Trace && game_id < 1801 && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = game_id + 10;}
-		if(kb_Data[1] == kb_Trace && game_id > 1800 && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = 1810;}
-		if(kb_Data[1] == kb_Graph && game_id < 1711 && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = game_id + 100;}
-		if(kb_Data[1] == kb_Graph && game_id > 1710 && (keyA != prevkeyA || keycountA > 2) && game_status == 0){game_id = 1810;}
-
-
-
+        if((keyA != prevkeyA || keycountA > 2) && game_status == 0){
+            if(kb_Data[1] == kb_Yequ && game_id > 99){game_id = game_id - 100;}
+  	    	if(kb_Data[1] == kb_Yequ && game_id < 100){game_id = 0;}
+  	    	if(kb_Data[1] == kb_Window && game_id > 9){game_id = game_id - 10;}
+  	    	if(kb_Data[1] == kb_Window && game_id < 10){game_id = 0;}
+  	    	if(kb_Data[1] == kb_Zoom){game_id = random() % 1811;}
+  	    	if(kb_Data[1] == kb_Trace && game_id < 1801){game_id = game_id + 10;}
+  	    	if(kb_Data[1] == kb_Trace && game_id > 1800){game_id = 1810;}
+  	    	if(kb_Data[1] == kb_Graph && game_id < 1711){game_id = game_id + 100;}
+  	    	if(kb_Data[1] == kb_Graph && game_id > 1710){game_id = 1810;}
+        }
+	      
+  
 		if(game_status == 0){GetCarPositionsFromId(game_id);}
 
 
