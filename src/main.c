@@ -24,7 +24,7 @@ uint8_t car_positions[2][19];
 void DrawTitle(){
 	gfx_SetTextScale(1,1);
 	gfx_SetTextXY(118,10);
-	gfx_PrintString("RushCE v1.2.0");
+	gfx_PrintString("RushCE v1.2.1");
 }
 
 
@@ -370,15 +370,15 @@ int main(void){
 
 		//Bottom menu navigation
         if((keyA != prevkeyA || keycountA > 2) && game_status == 0){
-            if(kb_Data[1] == kb_Yequ && game_id > 99){game_id = game_id - 100;}
-  	    	if(kb_Data[1] == kb_Yequ && game_id < 100){game_id = 0;}
-  	    	if(kb_Data[1] == kb_Window && game_id > 9){game_id = game_id - 10;}
-  	    	if(kb_Data[1] == kb_Window && game_id < 10){game_id = 0;}
-  	    	if(kb_Data[1] == kb_Zoom){game_id = random() % 1811;}
-  	    	if(kb_Data[1] == kb_Trace && game_id < 1801){game_id = game_id + 10;}
-  	    	if(kb_Data[1] == kb_Trace && game_id > 1800){game_id = 1810;}
-  	    	if(kb_Data[1] == kb_Graph && game_id < 1711){game_id = game_id + 100;}
-  	    	if(kb_Data[1] == kb_Graph && game_id > 1710){game_id = 1810;}
+            if(kb_Data[1] == kb_Yequ && game_id > 99){game_id = game_id - 100; delay(40);}
+  	    	if(kb_Data[1] == kb_Yequ && game_id < 100){game_id = 0; delay(40);}
+  	    	if(kb_Data[1] == kb_Window && game_id > 9){game_id = game_id - 10; delay(40);}
+  	    	if(kb_Data[1] == kb_Window && game_id < 10){game_id = 0; delay(40);}
+  	    	if(kb_Data[1] == kb_Zoom){game_id = random() % 1811; delay(40);}
+  	    	if(kb_Data[1] == kb_Trace && game_id < 1801){game_id = game_id + 10; delay(40);}
+  	    	if(kb_Data[1] == kb_Trace && game_id > 1800){game_id = 1810; delay(40);}
+  	    	if(kb_Data[1] == kb_Graph && game_id < 1711){game_id = game_id + 100; delay(40);}
+  	    	if(kb_Data[1] == kb_Graph && game_id > 1710){game_id = 1810; delay(40);}
         }
 	      
   
